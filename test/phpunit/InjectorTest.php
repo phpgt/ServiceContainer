@@ -19,6 +19,7 @@ class InjectorTest extends TestCase {
 		$sut = new Injector($container);
 
 		$exampleClass = new class {
+			/** @noinspection PhpUnused */
 			public function helloHtml(
 				Greeter $greeter,
 				string $name
