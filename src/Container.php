@@ -1,7 +1,9 @@
 <?php
 namespace Gt\ServiceContainer;
 
-class Container {
+use Psr\Container\ContainerInterface;
+
+class Container implements ContainerInterface {
 	/** @var array<string, mixed> */
 	private array $instances;
 	/** @var array<string, mixed> */
@@ -12,23 +14,28 @@ class Container {
 		$this->interfaces = [];
 	}
 
-	public function set(string $className, mixed $value):void {
-		$this->instances[$className] = $value;
+	public function set(string $id, mixed $value):void {
+		$this->instances[$id] = $value;
 
-		foreach(class_implements($className) as $interface) {
+		foreach(class_implements($id) as $interface) {
 			$this->interfaces[$interface] = $value;
 		}
 	}
 
-	public function get(string $className):mixed {
-		$value = $this->instances[$className]
-			?? $this->interfaces[$className]
-			?? null;
-
-		if(is_null($value)) {
-			throw new ServiceNotFoundException($className);
+	public function get(string $id):mixed {
+		if(!$this->has($id)) {
+			throw new ServiceNotFoundException($id);
 		}
 
-		return $value;
+		return $this->instances[$id]
+			?? $this->interfaces[$id];
+	}
+
+	public function has(string $id):bool {
+		return !is_null(
+			$this->instances[$id]
+			?? $this->interfaces[$id]
+			?? null
+		);
 	}
 }

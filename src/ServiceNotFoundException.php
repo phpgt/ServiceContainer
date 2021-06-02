@@ -1,9 +1,10 @@
 <?php
 namespace Gt\ServiceContainer;
 
+use Psr\Container\NotFoundExceptionInterface;
 use Throwable;
 
-class ServiceNotFoundException extends ServiceContainerException {
+class ServiceNotFoundException extends ServiceContainerException implements NotFoundExceptionInterface {
 	public function __construct(
 		string $className,
 		int $code = 0,
