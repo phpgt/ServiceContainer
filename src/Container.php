@@ -14,7 +14,8 @@ class Container implements ContainerInterface {
 		$this->interfaces = [];
 	}
 
-	public function set(string $id, mixed $value):void {
+	public function set(mixed $value):void {
+		$id = get_class($value);
 		$this->instances[$id] = $value;
 
 		foreach(class_implements($id) as $interface) {

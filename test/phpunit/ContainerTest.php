@@ -11,7 +11,7 @@ class ContainerTest extends TestCase {
 	public function testSetGet():void {
 		$greeter = new Greeter();
 		$sut = new Container();
-		$sut->set(Greeter::class, $greeter);
+		$sut->set($greeter);
 		self::assertSame($greeter, $sut->get(Greeter::class));
 	}
 
@@ -24,7 +24,7 @@ class ContainerTest extends TestCase {
 	public function testGet_interface():void {
 		$greeter = new Greeter();
 		$sut = new Container();
-		$sut->set(Greeter::class, $greeter);
+		$sut->set($greeter);
 		self::assertSame($greeter, $sut->get(GreetingInterface::class));
 	}
 }
