@@ -15,11 +15,18 @@ class Container implements ContainerInterface {
 	}
 
 	public function set(mixed $value):void {
-		$id = get_class($value);
+		if(is_object($value)) {
+			$id = get_class($value);
+		}
+		else {
+			$id = (string)$value;
+		}
+
 		$this->instances[$id] = $value;
 
-		foreach(class_implements($id) as $interface) {
-			$this->interfaces[$interface] = $value;
+		$classList = array_merge(class_parents($value), class_implements($value));
+		foreach($classList as $baseClassName) {
+			$this->interfaces[$baseClassName] = $value;
 		}
 	}
 
