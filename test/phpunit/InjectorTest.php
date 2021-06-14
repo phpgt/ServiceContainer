@@ -15,6 +15,7 @@ class InjectorTest extends TestCase {
 			});
 		$container = self::createMock(Container::class);
 		$container->method("get")
+			->with(Greeter::class)
 			->willReturn($greeter);
 		$sut = new Injector($container);
 
@@ -33,5 +34,23 @@ class InjectorTest extends TestCase {
 		]);
 
 		self::assertSame("<h1>Hello, PHPUnit!</h1>", $return);
+	}
+
+	public function testInvoke_noClass():void {
+		$invocationList = [];
+
+		$greeter = self::createMock(Greeter::class);
+		$container = self::createMock(Container::class);
+		$container->method("get")
+			->with(Greeter::class)
+			->willReturn($greeter);
+		$function = function(Greeter $greeterThing) use(&$invocationList):void {
+			array_push($invocationList, $greeterThing);
+		};
+
+		$sut = new Injector($container);
+		$sut->invoke(null, $function);
+		self::assertCount(1, $invocationList);
+		self::assertSame($greeter, $invocationList[0]);
 	}
 }

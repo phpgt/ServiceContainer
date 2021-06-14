@@ -2,6 +2,7 @@
 namespace Gt\ServiceContainer;
 
 use ReflectionClass;
+use ReflectionFunction;
 use ReflectionNamedType;
 
 class Injector {
@@ -11,24 +12,30 @@ class Injector {
 	}
 
 	/**
-	 * @param object $instance The instance of the object containing the
-	 * method to invoke.
-	 * @param string $methodName The method name to invoke.
+	 * @param object|null $instance The instance of the object containing
+	 * the method to invoke.
+	 * @param string $functionName The method name to invoke.
 	 * @param array<string, mixed> $extraArgs An associative array where the
 	 * keys will match the method parameters by *name*, for passing values
 	 * of PHP's inbuilt types like scalar values.
 	 * @return mixed The return value of the invoked method.
 	 */
 	public function invoke(
-		object $instance,
-		string $methodName,
+		?object $instance,
+		string|callable $functionName,
 		array $extraArgs = []
 	):mixed {
 		$arguments = [];
 
-		$refClass = new ReflectionClass($instance);
-		$refMethod = $refClass->getMethod($methodName);
-		foreach($refMethod->getParameters() as $refParam) {
+		if($instance) {
+			$refClass = new ReflectionClass($instance);
+			$refFunction = $refClass->getMethod($functionName);
+		}
+		else {
+			$refFunction = new ReflectionFunction($functionName);
+		}
+
+		foreach($refFunction->getParameters() as $refParam) {
 			/** @var ReflectionNamedType|null $refType */
 			$refType = $refParam->getType();
 			if(is_null($refType)
@@ -46,6 +53,10 @@ class Injector {
 			}
 		}
 
-		return $refMethod->invoke($instance, ...$arguments);
+		if($instance) {
+			array_unshift($arguments, $instance);
+		}
+
+		return $refFunction->invoke(...$arguments);
 	}
 }
