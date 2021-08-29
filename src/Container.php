@@ -15,13 +15,16 @@ class Container implements ContainerInterface {
 	}
 
 	public function set(mixed $value):void {
-		if(is_object($value)) {
-			$id = get_class($value);
-		}
-		else {
-			$id = (string)$value;
+		if(!is_object($value)) {
+			$type = gettype($value);
+			$valueString = "";
+			if(!is_null($value)) {
+				$valueString = " with value '$value'";
+			}
+			throw new ServiceContainerException("Values within the ServiceContainer must be objects, but a $type was supplied$valueString");
 		}
 
+		$id = get_class($value);
 		$this->instances[$id] = $value;
 
 		$classList = array_merge(class_parents($value), class_implements($value));
