@@ -33,13 +33,24 @@ class Container implements ContainerInterface {
 		}
 	}
 
+	public function setLoader(string $className, callable $callback):void {
+		$this->instances[$className] = $callback;
+	}
+
 	public function get(string $id):mixed {
 		if(!$this->has($id)) {
 			throw new ServiceNotFoundException($id);
 		}
 
-		return $this->instances[$id]
+		$object = $this->instances[$id]
 			?? $this->interfaces[$id];
+
+		if(is_callable($object)) {
+			$this->instances[$id] = $object();
+			return $this->instances[$id];
+		}
+
+		return $object;
 	}
 
 	public function has(string $id):bool {
