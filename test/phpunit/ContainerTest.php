@@ -43,4 +43,16 @@ class ContainerTest extends TestCase {
 		self::expectExceptionMessage("Values within the ServiceContainer must be objects, but a NULL was supplied");
 		$sut->set(null);
 	}
+
+	public function testSetLoader():void {
+		$greeterCallback = function():GreetingInterface {
+			return new Greeter();
+		};
+
+		$sut = new Container();
+		$sut->setLoader(Greeter::class, $greeterCallback);
+
+		$greeter = $sut->get(Greeter::class);
+		self::assertInstanceOf(GreetingInterface::class, $greeter);
+	}
 }
