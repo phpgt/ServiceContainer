@@ -37,6 +37,28 @@ class Container implements ContainerInterface {
 		$this->instances[$className] = $callback;
 	}
 
+	public function addLoaderClass(object $object):void {
+		$refClass = new \ReflectionClass($object);
+		foreach($refClass->getMethods() as $refMethod) {
+			foreach($refMethod->getAttributes(LazyLoad::class) as $refAttr) {
+				/** @var LazyLoad $lazyLoad */
+				$lazyLoad = $refAttr->newInstance();
+
+				$className = $lazyLoad->getClassName();
+				$callback = $refMethod->getClosure($object);
+
+				$this->setLoader(
+					$className,
+					$callback
+				);
+				$classList = array_merge(class_parents($className), class_implements($className));
+				foreach($classList as $baseClassName) {
+					$this->setLoader($baseClassName, $callback);
+				}
+			}
+		}
+	}
+
 	public function get(string $id):mixed {
 		if(!$this->has($id)) {
 			throw new ServiceNotFoundException($id);
