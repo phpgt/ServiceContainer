@@ -55,4 +55,18 @@ class ContainerTest extends TestCase {
 		$greeter = $sut->get(Greeter::class);
 		self::assertInstanceOf(GreetingInterface::class, $greeter);
 	}
+
+	public function testSetLoader_oneInstance():void {
+		$greeterCallback = function():GreetingInterface {
+			return new Greeter();
+		};
+
+		$sut = new Container();
+		$sut->setLoader(Greeter::class, $greeterCallback);
+
+		$greeter1 = $sut->get(Greeter::class);
+		$greeter2 = $sut->get(Greeter::class);
+
+		self::assertSame($greeter1, $greeter2);
+	}
 }

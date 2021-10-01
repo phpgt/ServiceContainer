@@ -46,7 +46,8 @@ class Container implements ContainerInterface {
 			?? $this->interfaces[$id];
 
 		if(is_callable($object)) {
-			return $object();
+			$this->instances[$id] = $object();
+			return $this->instances[$id];
 		}
 
 		return $object;
