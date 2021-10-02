@@ -1,7 +1,10 @@
 <?php
 namespace Gt\ServiceContainer\Test;
 
+use DateTime;
+use DateTimeInterface;
 use Gt\ServiceContainer\Container;
+use Gt\ServiceContainer\LazyLoad;
 use Gt\ServiceContainer\ServiceContainerException;
 use Gt\ServiceContainer\ServiceNotFoundException;
 use Gt\ServiceContainer\Test\Example\Greeter;
@@ -68,5 +71,42 @@ class ContainerTest extends TestCase {
 		$greeter2 = $sut->get(Greeter::class);
 
 		self::assertSame($greeter1, $greeter2);
+	}
+
+	public function testSetLoaderClass():void {
+		$loaderClass = new class {
+			#[LazyLoad(Greeter::class)]
+			public function doTheGreetThing():GreetingInterface {
+				return new Greeter();
+			}
+		};
+
+		$sut = new Container();
+		$sut->addLoaderClass($loaderClass);
+
+		$greeter = $sut->get(Greeter::class);
+		self::assertInstanceOf(Greeter::class, $greeter);
+	}
+
+	public function testSetLoaderClass_multipleClasses():void {
+		$loaderClass = new class {
+			#[LazyLoad(DateTime::class)]
+			public function getSomeSortOfDate():DateTimeInterface {
+				return new DateTime();
+			}
+
+			#[LazyLoad(Greeter::class)]
+			public function doTheGreetThing():GreetingInterface {
+				return new Greeter();
+			}
+		};
+
+		$sut = new Container();
+		$sut->addLoaderClass($loaderClass);
+
+		$greeter = $sut->get(Greeter::class);
+		$dateTime = $sut->get(DateTimeInterface::class);
+		self::assertInstanceOf(Greeter::class, $greeter);
+		self::assertInstanceOf(DateTime::class, $dateTime);
 	}
 }
