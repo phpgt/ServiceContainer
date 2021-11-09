@@ -109,4 +109,65 @@ class ContainerTest extends TestCase {
 		self::assertInstanceOf(Greeter::class, $greeter);
 		self::assertInstanceOf(DateTime::class, $dateTime);
 	}
+
+	public function testSetLoader_nullable():void {
+		$sut = new Container();
+		$callback = function():?Greeter {
+			return null;
+		};
+		$sut->setLoader(Greeter::class, $callback);
+
+		$greeterOrNull = $sut->get(Greeter::class);
+		self::assertNull($greeterOrNull);
+	}
+
+	public function testSetLoaderClass_nullable():void {
+		$loaderClass = new class {
+			#[LazyLoad(Greeter::class)]
+			public function getGreeterOrNull():?Greeter {
+				return null;
+			}
+		};
+		$sut = new Container();
+		$sut->addLoaderClass($loaderClass);
+
+		$greeterOrNull = $sut->get(Greeter::class);
+		self::assertNull($greeterOrNull);
+	}
+
+	/**
+	 * This is the webengine-style loader, where the name of the class
+	 * is obtained from the go() function parameters.
+	 */
+	public function testSetLoaderClass_nullable_loadFromAnotherClass():void {
+		$loaderClass = new class {
+			#[LazyLoad(Greeter::class)]
+			public function getGreeterOrNull():?Greeter {
+				return null;
+			}
+		};
+		$sut = new Container();
+		$sut->addLoaderClass($loaderClass);
+
+		$exampleClass = new class {
+			public function go(?Greeter $greeter):void {
+				if($greeter) {
+					echo $greeter->greet("Cody");
+				}
+			}
+		};
+
+		$typeNameArray = [];
+
+		$refClass = new \ReflectionClass($exampleClass);
+		foreach($refClass->getMethods() as $refMethod) {
+			foreach($refMethod->getParameters() as $refParam) {
+				$refType = $refParam->getType();
+				array_push($typeNameArray, $refType->getName());
+			}
+		}
+
+		$greeterOrNull = $sut->get($typeNameArray[0]);
+		self::assertNull($greeterOrNull);
+	}
 }
