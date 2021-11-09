@@ -48,7 +48,7 @@ class Injector {
 			else {
 				array_push(
 					$arguments,
-					$this->container->get($refType)
+					$this->container->get($refType->getName())
 				);
 			}
 		}
