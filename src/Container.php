@@ -45,6 +45,9 @@ class Container implements ContainerInterface {
 				$lazyLoad = $refAttr->newInstance();
 
 				$className = $lazyLoad->getClassName();
+				if(is_null($className)) {
+					$className = $refMethod->getReturnType()->getName();
+				}
 				$callback = $refMethod->getClosure($object);
 
 				$this->setLoader(

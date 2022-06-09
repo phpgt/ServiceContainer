@@ -110,6 +110,21 @@ class ContainerTest extends TestCase {
 		self::assertInstanceOf(DateTime::class, $dateTime);
 	}
 
+	public function testSetLoaderClass_lazyLoadNoArgument():void {
+		$loaderClass = new class {
+			#[LazyLoad]
+			public function doTheGreetThing():Greeter {
+				return new Greeter();
+			}
+		};
+
+		$sut = new Container();
+		$sut->addLoaderClass($loaderClass);
+
+		$greeter = $sut->get(Greeter::class);
+		self::assertInstanceOf(Greeter::class, $greeter);
+	}
+
 	public function testSetLoader_nullable():void {
 		$sut = new Container();
 		$callback = function():?Greeter {
