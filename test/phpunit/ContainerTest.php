@@ -4,6 +4,7 @@ namespace Gt\ServiceContainer\Test;
 use DateTime;
 use DateTimeInterface;
 use Gt\ServiceContainer\Container;
+use Gt\ServiceContainer\Injector;
 use Gt\ServiceContainer\LazyLoad;
 use Gt\ServiceContainer\ServiceContainerException;
 use Gt\ServiceContainer\ServiceNotFoundException;

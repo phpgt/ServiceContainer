@@ -64,6 +64,11 @@ class Container implements ContainerInterface {
 		}
 	}
 
+	/**
+	 * @template T
+	 * @param class-string<T> $id
+	 * @return null|T
+	 */
 	public function get(string $id):mixed {
 		if(!$this->has($id)) {
 			throw new ServiceNotFoundException($id);
