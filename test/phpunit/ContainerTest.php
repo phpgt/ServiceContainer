@@ -9,6 +9,7 @@ use Gt\ServiceContainer\ServiceContainerException;
 use Gt\ServiceContainer\ServiceNotFoundException;
 use Gt\ServiceContainer\Test\Example\Greeter;
 use Gt\ServiceContainer\Test\Example\GreetingInterface;
+use Gt\ServiceContainer\Test\Example\UriGreeter;
 use PHPUnit\Framework\TestCase;
 
 class ContainerTest extends TestCase {
@@ -184,5 +185,25 @@ class ContainerTest extends TestCase {
 
 		$greeterOrNull = $sut->get($typeNameArray[0]);
 		self::assertNull($greeterOrNull);
+	}
+
+	public function testChainedLoader():void {
+		$loaderClass = new class {
+			#[LazyLoad]
+			public function loadGreeter():GreetingInterface {
+				return new Greeter();
+			}
+
+			#[LazyLoad]
+			public function loadUriGreeter(GreetingInterface $greeter):UriGreeter {
+				return new UriGreeter($greeter);
+			}
+		};
+
+		$sut = new Container();
+		$sut->addLoaderClass($loaderClass);
+
+		$uriGreeter = $sut->get(UriGreeter::class);
+		self::assertSame("Hello, you are on page /about!", $uriGreeter->greet("/about"));
 	}
 }

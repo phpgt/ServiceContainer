@@ -8,10 +8,12 @@ class Container implements ContainerInterface {
 	private array $instances;
 	/** @var array<string, mixed> */
 	private array $interfaces;
+	private Injector $injector;
 
-	public function __construct() {
+	public function __construct(?Injector $injector = null) {
 		$this->instances = [];
 		$this->interfaces = [];
+		$this->injector = $injector ?? new Injector($this);
 	}
 
 	public function set(mixed $value):void {
@@ -71,7 +73,7 @@ class Container implements ContainerInterface {
 			?? $this->interfaces[$id];
 
 		if(is_callable($object)) {
-			$this->instances[$id] = $object();
+			$this->instances[$id] = $this->injector->invoke(null, $object);
 			return $this->instances[$id];
 		}
 
