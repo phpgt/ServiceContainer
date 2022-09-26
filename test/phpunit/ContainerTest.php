@@ -3,8 +3,8 @@ namespace Gt\ServiceContainer\Test;
 
 use DateTime;
 use DateTimeInterface;
+use DirectoryIterator;
 use Gt\ServiceContainer\Container;
-use Gt\ServiceContainer\Injector;
 use Gt\ServiceContainer\LazyLoad;
 use Gt\ServiceContainer\ServiceContainerException;
 use Gt\ServiceContainer\ServiceNotFoundException;
@@ -12,6 +12,7 @@ use Gt\ServiceContainer\Test\Example\Greeter;
 use Gt\ServiceContainer\Test\Example\GreetingInterface;
 use Gt\ServiceContainer\Test\Example\UriGreeter;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class ContainerTest extends TestCase {
 	public function testSetGet():void {
@@ -47,6 +48,17 @@ class ContainerTest extends TestCase {
 		self::expectException(ServiceContainerException::class);
 		self::expectExceptionMessage("Values within the ServiceContainer must be objects, but a NULL was supplied");
 		$sut->set(null);
+	}
+
+	public function testSet_multiple():void {
+		$dateTime = new DateTime();
+		$iterator = new DirectoryIterator("/tmp");
+		$obj = new stdClass();
+		$sut = new Container();
+		$sut->set($dateTime, $iterator, $obj);
+		self::assertSame($dateTime, $sut->get(DateTime::class));
+		self::assertSame($iterator, $sut->get(DirectoryIterator::class));
+		self::assertSame($obj, $sut->get(stdClass::class));
 	}
 
 	public function testSetLoader():void {

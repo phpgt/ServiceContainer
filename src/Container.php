@@ -16,22 +16,24 @@ class Container implements ContainerInterface {
 		$this->injector = $injector ?? new Injector($this);
 	}
 
-	public function set(mixed $value):void {
-		if(!is_object($value)) {
-			$type = gettype($value);
-			$valueString = "";
-			if(!is_null($value)) {
-				$valueString = " with value '$value'";
+	public function set(mixed...$serviceList):void {
+		foreach($serviceList as $service) {
+			if(!is_object($service)) {
+				$type = gettype($service);
+				$valueString = "";
+				if(!is_null($service)) {
+					$valueString = " with value '$service'";
+				}
+				throw new ServiceContainerException("Values within the ServiceContainer must be objects, but a $type was supplied$valueString");
 			}
-			throw new ServiceContainerException("Values within the ServiceContainer must be objects, but a $type was supplied$valueString");
-		}
 
-		$id = get_class($value);
-		$this->instances[$id] = $value;
+			$id = get_class($service);
+			$this->instances[$id] = $service;
 
-		$classList = array_merge(class_parents($value), class_implements($value));
-		foreach($classList as $baseClassName) {
-			$this->interfaces[$baseClassName] = $value;
+			$classList = array_merge(class_parents($service), class_implements($service));
+			foreach($classList as $baseClassName) {
+				$this->interfaces[$baseClassName] = $service;
+			}
 		}
 	}
 
