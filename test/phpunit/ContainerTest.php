@@ -5,7 +5,6 @@ use DateTime;
 use DateTimeInterface;
 use DirectoryIterator;
 use Gt\ServiceContainer\Container;
-use Gt\ServiceContainer\LazyLoad;
 use Gt\ServiceContainer\ServiceContainerException;
 use Gt\ServiceContainer\ServiceNotFoundException;
 use Gt\ServiceContainer\Test\Example\Greeter;
@@ -120,21 +119,6 @@ class ContainerTest extends TestCase {
 		self::assertInstanceOf(DateTime::class, $dateTime);
 	}
 
-	public function testSetLoaderClass_lazyLoadNoArgument():void {
-		$loaderClass = new class {
-			#[LazyLoad]
-			public function doTheGreetThing():Greeter {
-				return new Greeter();
-			}
-		};
-
-		$sut = new Container();
-		$sut->addLoaderClass($loaderClass);
-
-		$greeter = $sut->get(Greeter::class);
-		self::assertInstanceOf(Greeter::class, $greeter);
-	}
-
 	public function testSetLoader_nullable():void {
 		$sut = new Container();
 		$callback = function():?Greeter {
@@ -148,7 +132,6 @@ class ContainerTest extends TestCase {
 
 	public function testSetLoaderClass_nullable():void {
 		$loaderClass = new class {
-			#[LazyLoad(Greeter::class)]
 			public function getGreeterOrNull():?Greeter {
 				return null;
 			}
@@ -166,7 +149,6 @@ class ContainerTest extends TestCase {
 	 */
 	public function testSetLoaderClass_nullable_loadFromAnotherClass():void {
 		$loaderClass = new class {
-			#[LazyLoad(Greeter::class)]
 			public function getGreeterOrNull():?Greeter {
 				return null;
 			}
@@ -198,12 +180,9 @@ class ContainerTest extends TestCase {
 
 	public function testChainedLoader():void {
 		$loaderClass = new class {
-			#[LazyLoad]
 			public function loadGreeter():GreetingInterface {
 				return new Greeter();
 			}
-
-			#[LazyLoad]
 			public function loadUriGreeter(GreetingInterface $greeter):UriGreeter {
 				return new UriGreeter($greeter);
 			}
