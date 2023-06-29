@@ -51,6 +51,7 @@ class Container implements ContainerInterface {
 
 				$className = $lazyLoad->getClassName();
 				if(is_null($className)) {
+					/** @phpstan-ignore-next-line For some reason, PHPStan can't see getName() */
 					$className = $refMethod->getReturnType()->getName();
 				}
 				$callback = $refMethod->getClosure($object);
