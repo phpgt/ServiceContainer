@@ -2,6 +2,7 @@
 namespace Gt\ServiceContainer;
 
 use Psr\Container\ContainerInterface;
+use ReflectionClass;
 
 class Container implements ContainerInterface {
 	/** @var array<string, mixed> */
@@ -42,7 +43,7 @@ class Container implements ContainerInterface {
 	}
 
 	public function addLoaderClass(object $object):void {
-		$refClass = new \ReflectionClass($object);
+		$refClass = new ReflectionClass($object);
 		foreach($refClass->getMethods() as $refMethod) {
 			foreach($refMethod->getAttributes(LazyLoad::class) as $refAttr) {
 				/** @var LazyLoad $lazyLoad */
