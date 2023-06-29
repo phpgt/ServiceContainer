@@ -1,5 +1,5 @@
-Centralised construction of a project's core objects.
-=====================================================
+Centralised container of a project's core objects.
+==================================================
 
 When PHP applications have a lot of classes, it's important to use [dependency injection][dependency-injection] techniques to keep your code maintainable and testable; rather than constructing objects within the functions they are used, pass the objects into the function via parameters.
 
@@ -14,10 +14,10 @@ This repository is used within [WebEngine][webengine] to automatically invoke Pa
 <a href="https://github.com/PhpGt/ServiceContainer/actions" target="_blank">
 	<img src="https://badge.status.php.gt/servicecontainer-build.svg" alt="Build status" />
 </a>
-<a href="https://scrutinizer-ci.com/g/PhpGt/ServiceContainer" target="_blank">
+<a href="https://app.codacy.com/gh/PhpGt/ServiceContainer" target="_blank">
 	<img src="https://badge.status.php.gt/servicecontainer-quality.svg" alt="Code quality" />
 </a>
-<a href="https://scrutinizer-ci.com/g/PhpGt/ServiceContainer" target="_blank">
+<a href="https://app.codecov.io/gh/PhpGt/ServiceContainer" target="_blank">
 	<img src="https://badge.status.php.gt/servicecontainer-coverage.svg" alt="Code coverage" />
 </a>
 <a href="https://packagist.org/packages/PhpGt/ServiceContainer" target="_blank">
