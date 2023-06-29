@@ -1,6 +1,6 @@
 {
 	"name": "phpgt/servicecontainer",
-	"description": "Centralised construction of a project's core objects.",
+	"description": "Centralised container of a project's core objects.",
 	"license": "MIT",
 
 	"require": {
