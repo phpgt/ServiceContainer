@@ -89,7 +89,6 @@ class ContainerTest extends TestCase {
 
 	public function testSetLoaderClass():void {
 		$loaderClass = new class {
-			#[LazyLoad(Greeter::class)]
 			public function doTheGreetThing():GreetingInterface {
 				return new Greeter();
 			}
@@ -98,18 +97,15 @@ class ContainerTest extends TestCase {
 		$sut = new Container();
 		$sut->addLoaderClass($loaderClass);
 
-		$greeter = $sut->get(Greeter::class);
+		$greeter = $sut->get(GreetingInterface::class);
 		self::assertInstanceOf(Greeter::class, $greeter);
 	}
 
 	public function testSetLoaderClass_multipleClasses():void {
 		$loaderClass = new class {
-			#[LazyLoad(DateTime::class)]
 			public function getSomeSortOfDate():DateTimeInterface {
 				return new DateTime();
 			}
-
-			#[LazyLoad(Greeter::class)]
 			public function doTheGreetThing():GreetingInterface {
 				return new Greeter();
 			}
@@ -118,7 +114,7 @@ class ContainerTest extends TestCase {
 		$sut = new Container();
 		$sut->addLoaderClass($loaderClass);
 
-		$greeter = $sut->get(Greeter::class);
+		$greeter = $sut->get(GreetingInterface::class);
 		$dateTime = $sut->get(DateTimeInterface::class);
 		self::assertInstanceOf(Greeter::class, $greeter);
 		self::assertInstanceOf(DateTime::class, $dateTime);

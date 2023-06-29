@@ -3,6 +3,7 @@ namespace Gt\ServiceContainer;
 
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
+use ReflectionMethod;
 
 class Container implements ContainerInterface {
 	/** @var array<string, mixed> */
@@ -44,26 +45,17 @@ class Container implements ContainerInterface {
 
 	public function addLoaderClass(object $object):void {
 		$refClass = new ReflectionClass($object);
-		foreach($refClass->getMethods() as $refMethod) {
-			foreach($refMethod->getAttributes(LazyLoad::class) as $refAttr) {
-				/** @var LazyLoad $lazyLoad */
-				$lazyLoad = $refAttr->newInstance();
+		foreach($refClass->getMethods(ReflectionMethod::IS_PUBLIC) as $refPublicMethod) {
+			$className = $refPublicMethod->getReturnType()->getName();
+			$callback = $refPublicMethod->getClosure($object);
 
-				$className = $lazyLoad->getClassName();
-				if(is_null($className)) {
-					/** @phpstan-ignore-next-line For some reason, PHPStan can't see getName() */
-					$className = $refMethod->getReturnType()->getName();
-				}
-				$callback = $refMethod->getClosure($object);
-
-				$this->setLoader(
-					$className,
-					$callback
-				);
-				$classList = array_merge(class_parents($className), class_implements($className));
-				foreach($classList as $baseClassName) {
-					$this->setLoader($baseClassName, $callback);
-				}
+			$this->setLoader(
+				$className,
+				$callback
+			);
+			$classList = array_merge(class_parents($className), class_implements($className));
+			foreach($classList as $baseClassName) {
+				$this->setLoader($baseClassName, $callback);
 			}
 		}
 	}
