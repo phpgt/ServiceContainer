@@ -5,7 +5,6 @@ use DateTime;
 use DateTimeInterface;
 use DirectoryIterator;
 use Gt\ServiceContainer\Container;
-use Gt\ServiceContainer\LazyLoad;
 use Gt\ServiceContainer\ServiceContainerException;
 use Gt\ServiceContainer\ServiceNotFoundException;
 use Gt\ServiceContainer\Test\Example\Greeter;
@@ -89,7 +88,6 @@ class ContainerTest extends TestCase {
 
 	public function testSetLoaderClass():void {
 		$loaderClass = new class {
-			#[LazyLoad(Greeter::class)]
 			public function doTheGreetThing():GreetingInterface {
 				return new Greeter();
 			}
@@ -98,18 +96,15 @@ class ContainerTest extends TestCase {
 		$sut = new Container();
 		$sut->addLoaderClass($loaderClass);
 
-		$greeter = $sut->get(Greeter::class);
+		$greeter = $sut->get(GreetingInterface::class);
 		self::assertInstanceOf(Greeter::class, $greeter);
 	}
 
 	public function testSetLoaderClass_multipleClasses():void {
 		$loaderClass = new class {
-			#[LazyLoad(DateTime::class)]
 			public function getSomeSortOfDate():DateTimeInterface {
 				return new DateTime();
 			}
-
-			#[LazyLoad(Greeter::class)]
 			public function doTheGreetThing():GreetingInterface {
 				return new Greeter();
 			}
@@ -118,25 +113,10 @@ class ContainerTest extends TestCase {
 		$sut = new Container();
 		$sut->addLoaderClass($loaderClass);
 
-		$greeter = $sut->get(Greeter::class);
+		$greeter = $sut->get(GreetingInterface::class);
 		$dateTime = $sut->get(DateTimeInterface::class);
 		self::assertInstanceOf(Greeter::class, $greeter);
 		self::assertInstanceOf(DateTime::class, $dateTime);
-	}
-
-	public function testSetLoaderClass_lazyLoadNoArgument():void {
-		$loaderClass = new class {
-			#[LazyLoad]
-			public function doTheGreetThing():Greeter {
-				return new Greeter();
-			}
-		};
-
-		$sut = new Container();
-		$sut->addLoaderClass($loaderClass);
-
-		$greeter = $sut->get(Greeter::class);
-		self::assertInstanceOf(Greeter::class, $greeter);
 	}
 
 	public function testSetLoader_nullable():void {
@@ -152,7 +132,6 @@ class ContainerTest extends TestCase {
 
 	public function testSetLoaderClass_nullable():void {
 		$loaderClass = new class {
-			#[LazyLoad(Greeter::class)]
 			public function getGreeterOrNull():?Greeter {
 				return null;
 			}
@@ -170,7 +149,6 @@ class ContainerTest extends TestCase {
 	 */
 	public function testSetLoaderClass_nullable_loadFromAnotherClass():void {
 		$loaderClass = new class {
-			#[LazyLoad(Greeter::class)]
 			public function getGreeterOrNull():?Greeter {
 				return null;
 			}
@@ -202,12 +180,9 @@ class ContainerTest extends TestCase {
 
 	public function testChainedLoader():void {
 		$loaderClass = new class {
-			#[LazyLoad]
 			public function loadGreeter():GreetingInterface {
 				return new Greeter();
 			}
-
-			#[LazyLoad]
 			public function loadUriGreeter(GreetingInterface $greeter):UriGreeter {
 				return new UriGreeter($greeter);
 			}
