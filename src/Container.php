@@ -46,8 +46,12 @@ class Container implements ContainerInterface {
 	public function addLoaderClass(object $object):void {
 		$refClass = new ReflectionClass($object);
 		foreach($refClass->getMethods(ReflectionMethod::IS_PUBLIC) as $refPublicMethod) {
+			$type = $refPublicMethod->getReturnType();
+			if(!$type) {
+				continue;
+			}
 			/** @phpstan-ignore-next-line Why can't PHPStan see getName() ? */
-			$className = $refPublicMethod->getReturnType()->getName();
+			$className = $type->getName();
 			$callback = $refPublicMethod->getClosure($object);
 
 			$this->setLoader(
