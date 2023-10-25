@@ -1,6 +1,7 @@
 <?php
 namespace Gt\ServiceContainer\Test;
 
+use DateTime;
 use Gt\ServiceContainer\Container;
 use Gt\ServiceContainer\Injector;
 use Gt\ServiceContainer\Test\Example\Greeter;
@@ -13,6 +14,8 @@ class InjectorTest extends TestCase {
 			->willReturnCallback(function(string $name) {
 				return "Hello, $name!";
 			});
+		$dateTime = new DateTime("1988-04-05 17:24");
+
 		$container = self::createMock(Container::class);
 		$container->method("get")
 			->with(Greeter::class)
@@ -23,17 +26,17 @@ class InjectorTest extends TestCase {
 			/** @noinspection PhpUnused */
 			public function helloHtml(
 				Greeter $greeter,
-				string $name
+				DateTime $dateOfBirth,
 			):string {
-				return "<h1>" . $greeter->greet($name) . "</h1>";
+				return "<p>" . $greeter->greet() . " You were born on a " . $dateOfBirth->format("l") . ".</p>";
 			}
 		};
 
 		$return = $sut->invoke(new $exampleClass(), "helloHtml", [
-			"name" => "PHPUnit",
+			DateTime::class => $dateTime,
 		]);
 
-		self::assertSame("<h1>Hello, PHPUnit!</h1>", $return);
+		self::assertSame("<p>Hello, you! You were born on a Tuesday.</p>", $return);
 	}
 
 	public function testInvoke_noClass():void {
