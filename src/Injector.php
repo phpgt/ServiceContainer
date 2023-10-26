@@ -11,11 +11,19 @@ class Injector {
 	) {
 	}
 
-	/** @param array<string, object> $extraArgs */
+	/**
+	 * @param object|null $instance The instance of the object containing
+	 * the method to invoke.
+	 * @param string $functionName The method name to invoke.
+	 * @param array<string, mixed> $extraArgs An associative array where the
+	 * keys will match the method parameters by *name*, for passing values
+	 * of PHP's inbuilt types like scalar values.
+	 * @return mixed The return value of the invoked method.
+	 */
 	public function invoke(
 		?object $instance,
 		string|callable $functionName,
-		array $extraArgs = [],
+		array $extraArgs = []
 	):mixed {
 		$arguments = [];
 
@@ -30,23 +38,12 @@ class Injector {
 		foreach($refFunction->getParameters() as $refParam) {
 			/** @var ReflectionNamedType|null $refType */
 			$refType = $refParam->getType();
+			$refParamTypeName = $refType->getName();
 
-// Check if we have a match in $extraArgs, otherwise get from the container:
-			/** @var class-string $className */
-			$className = $refType->getName();
-			if(array_key_exists($className, $extraArgs)) {
-				array_push(
-					$arguments,
-					$extraArgs[$className],
-				);
-			}
-			else {
-				array_push(
-					$arguments,
-					$this->container->get($className)
-				);
-			}
-
+			array_push(
+				$arguments,
+				$extraArgs[$refParamTypeName] ?? $this->container->get($refType->getName())
+			);
 		}
 
 		if($instance) {
