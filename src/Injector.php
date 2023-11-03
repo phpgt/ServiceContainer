@@ -40,10 +40,23 @@ class Injector {
 			$refType = $refParam->getType();
 			$refParamTypeName = $refType->getName();
 
-			array_push(
-				$arguments,
-				$extraArgs[$refParamTypeName] ?? $this->container->get($refType->getName())
-			);
+			try {
+				array_push(
+					$arguments,
+					$extraArgs[$refParamTypeName] ?? $this->container->get($refType->getName())
+				);
+			}
+			catch(ServiceNotFoundException $exception) {
+				if($refType->allowsNull()) {
+					array_push(
+						$arguments,
+						null,
+					);
+				}
+				else {
+					throw $exception;
+				}
+			}
 		}
 
 		if($instance) {
