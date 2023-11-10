@@ -38,18 +38,24 @@ class Injector {
 		foreach($refFunction->getParameters() as $refParam) {
 			/** @var ReflectionNamedType|null $refType */
 			$refType = $refParam->getType();
-			if(is_null($refType)
-			|| $refType->isBuiltin()) {
+			$refParamTypeName = $refType->getName();
+
+			try {
 				array_push(
 					$arguments,
-					$extraArgs[$refParam->getName()]
+					$extraArgs[$refParamTypeName] ?? $this->container->get($refType->getName())
 				);
 			}
-			else {
-				array_push(
-					$arguments,
-					$this->container->get($refType->getName())
-				);
+			catch(ServiceNotFoundException $exception) {
+				if($refType->allowsNull()) {
+					array_push(
+						$arguments,
+						null,
+					);
+				}
+				else {
+					throw $exception;
+				}
 			}
 		}
 
