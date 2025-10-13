@@ -29,3 +29,9 @@ This repository is used within [WebEngine][webengine] to automatically invoke Pa
 
 [dependency-injection]: https://martinfowler.com/articles/injection.html
 [webengine]: https://www.php.gt/webengine
+
+# Proudly sponsored by
+
+[JetBrains Open Source sponsorship program](https://www.jetbrains.com/community/opensource/)
+
+[![JetBrains logo.](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)](https://www.jetbrains.com/community/opensource/)
