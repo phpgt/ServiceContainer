@@ -43,7 +43,7 @@ class Injector {
 			try {
 				array_push(
 					$arguments,
-					$extraArgs[$refParamTypeName] ?? $this->container->get($refType->getName()) /** @phpstan-ignore-line It's impossible to know the type of the refType at this point. */
+					$extraArgs[$refParamTypeName] ?? $this->container->get($refType->getName())
 				);
 			}
 			catch(ServiceNotFoundException $exception) {
