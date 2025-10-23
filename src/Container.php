@@ -71,6 +71,13 @@ class Container implements ContainerInterface {
 	 * @return null|T
 	 */
 	public function get(string $id):mixed {
+// This first "has" check is temporary, while all repositories switch from Gt to GT.
+		if(!$this->has($id)) {
+			if(str_starts_with($id, "GT\\")
+				&& !str_starts_with($id, "GT\\Website\\")) {
+				$id = preg_replace('/^GT\\\/', "Gt\\", $id);
+			}
+		}
 		if(!$this->has($id)) {
 			throw new ServiceNotFoundException($id);
 		}
