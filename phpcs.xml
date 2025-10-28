@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="PHP.Gt Standard" namespace="Gt\CS\Standard">
-	<description>Created from PHP.Gt/Styleguide</description>
+	<description>Created from PHP.GT/Styleguide</description>
 	<arg name="extensions" value="php" />
 
 	<rule ref="Generic.Classes.DuplicateClassName" />
@@ -12,7 +12,6 @@
 	<rule ref="Generic.CodeAnalysis.JumbledIncrementer" />
 	<rule ref="Generic.CodeAnalysis.UnconditionalIfStatement" />
 	<rule ref="Generic.CodeAnalysis.UnnecessaryFinalModifier" />
-	<rule ref="Generic.CodeAnalysis.UnusedFunctionParameter" />
 	<rule ref="Generic.CodeAnalysis.UselessOverridingMethod" />
 	<rule ref="Generic.ControlStructures.InlineControlStructure" />
 	<rule ref="Generic.Files.ByteOrderMark" />
@@ -24,12 +23,10 @@
 	<rule ref="Generic.Files.OneObjectStructurePerFile" />
 	<rule ref="Generic.Files.OneTraitPerFile" />
 	<rule ref="Generic.Formatting.DisallowMultipleStatements" />
-	<rule ref="Generic.Formatting.NoSpaceAfterCast" />
 	<rule ref="Generic.Functions.FunctionCallArgumentSpacing" />
 	<rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie" />
 	<rule ref="Generic.Metrics.CyclomaticComplexity" />
 	<rule ref="Generic.Metrics.NestingLevel" />
-	<rule ref="Generic.NamingConventions.CamelCapsFunctionName" />
 	<rule ref="Generic.NamingConventions.ConstructorName" />
 	<rule ref="Generic.NamingConventions.UpperCaseConstantName" />
 	<rule ref="Generic.PHP.BacktickOperator" />
