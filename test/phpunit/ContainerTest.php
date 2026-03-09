@@ -34,6 +34,15 @@ class ContainerTest extends TestCase {
 		self::assertSame($greeter, $sut->get(GreetingInterface::class));
 	}
 
+	public function testGet_isCaseInsensitive():void {
+		$greeter = new Greeter();
+		$sut = new Container();
+		$sut->set($greeter);
+
+		$greeterClassLowercase = strtolower(Greeter::class);
+		self::assertSame($greeter, $sut->get($greeterClassLowercase));
+	}
+
 	public function testSet_string():void {
 		$string = "Test String!";
 		$sut = new Container();
