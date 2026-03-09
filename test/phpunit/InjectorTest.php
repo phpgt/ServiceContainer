@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class InjectorTest extends TestCase {
 	public function testInvoke():void {
-		$greeter = self::createMock(Greeter::class);
+		$greeter = self::createStub(Greeter::class);
 		$greeter->method("greet")
 			->willReturnCallback(function(string $name) {
 				return "Hello, $name!";
@@ -42,7 +42,7 @@ class InjectorTest extends TestCase {
 	public function testInvoke_noClass():void {
 		$invocationList = [];
 
-		$greeter = self::createMock(Greeter::class);
+		$greeter = self::createStub(Greeter::class);
 		$container = self::createMock(Container::class);
 		$container->method("get")
 			->with(Greeter::class)

@@ -30,16 +30,19 @@ class Container implements ContainerInterface {
 			}
 
 			$id = get_class($service);
+			$id = strtolower($id);
 			$this->instances[$id] = $service;
 
 			$classList = array_merge(class_parents($service), class_implements($service));
 			foreach($classList as $baseClassName) {
+				$baseClassName = strtolower($baseClassName);
 				$this->interfaces[$baseClassName] = $service;
 			}
 		}
 	}
 
 	public function setLoader(string $className, callable $callback):void {
+		$className = strtolower($className);
 		$this->instances[$className] = $callback;
 	}
 
@@ -71,15 +74,11 @@ class Container implements ContainerInterface {
 	 * @return null|T
 	 */
 	public function get(string $id):mixed {
-// This first "has" check is temporary, while all repositories switch from Gt to GT.
+		$idOriginalCase = $id;
+		$id = strtolower($id);
+
 		if(!$this->has($id)) {
-			if(str_starts_with($id, "GT\\")
-				&& !str_starts_with($id, "GT\\Website\\")) {
-				$id = preg_replace('/^GT\\\/', "Gt\\", $id);
-			}
-		}
-		if(!$this->has($id)) {
-			throw new ServiceNotFoundException($id);
+			throw new ServiceNotFoundException($idOriginalCase);
 		}
 
 		$object = $this->instances[$id]
@@ -94,6 +93,8 @@ class Container implements ContainerInterface {
 	}
 
 	public function has(string $id):bool {
+		$id = strtolower($id);
+
 		return !is_null(
 			$this->instances[$id]
 			?? $this->interfaces[$id]
