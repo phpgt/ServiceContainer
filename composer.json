@@ -20,11 +20,13 @@
 
 	"autoload": {
 		"psr-4": {
+			"GT\\ServiceContainer\\": "./src",
 			"Gt\\ServiceContainer\\": "./src"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
+			"GT\\ServiceContainer\\Test\\": "./test/phpunit",
 			"Gt\\ServiceContainer\\Test\\": "./test/phpunit"
 		}
 	},

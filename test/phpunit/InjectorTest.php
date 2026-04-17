@@ -1,10 +1,10 @@
 <?php
-namespace Gt\ServiceContainer\Test;
+namespace GT\ServiceContainer\Test;
 
 use DateTime;
-use Gt\ServiceContainer\Container;
-use Gt\ServiceContainer\Injector;
-use Gt\ServiceContainer\Test\Example\Greeter;
+use GT\ServiceContainer\Container;
+use GT\ServiceContainer\Injector;
+use GT\ServiceContainer\Test\Example\Greeter;
 use PHPUnit\Framework\TestCase;
 
 class InjectorTest extends TestCase {

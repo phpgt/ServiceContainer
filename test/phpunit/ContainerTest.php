@@ -1,15 +1,15 @@
 <?php
-namespace Gt\ServiceContainer\Test;
+namespace GT\ServiceContainer\Test;
 
 use DateTime;
 use DateTimeInterface;
 use DirectoryIterator;
-use Gt\ServiceContainer\Container;
-use Gt\ServiceContainer\ServiceContainerException;
-use Gt\ServiceContainer\ServiceNotFoundException;
-use Gt\ServiceContainer\Test\Example\Greeter;
-use Gt\ServiceContainer\Test\Example\GreetingInterface;
-use Gt\ServiceContainer\Test\Example\UriGreeter;
+use GT\ServiceContainer\Container;
+use GT\ServiceContainer\ServiceContainerException;
+use GT\ServiceContainer\ServiceNotFoundException;
+use GT\ServiceContainer\Test\Example\Greeter;
+use GT\ServiceContainer\Test\Example\GreetingInterface;
+use GT\ServiceContainer\Test\Example\UriGreeter;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
