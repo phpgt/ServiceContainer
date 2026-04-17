@@ -1,5 +1,5 @@
 <?php
-namespace Gt\ServiceContainer\Test\Example;
+namespace GT\ServiceContainer\Test\Example;
 
 class UriGreeter {
 	public function __construct(private Greeter $greeter) {
