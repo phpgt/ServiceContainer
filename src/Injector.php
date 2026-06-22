@@ -4,6 +4,7 @@ namespace Gt\ServiceContainer;
 use ReflectionClass;
 use ReflectionFunction;
 use ReflectionNamedType;
+use ReflectionParameter;
 
 class Injector {
 	public function __construct(
@@ -36,28 +37,7 @@ class Injector {
 		}
 
 		foreach($refFunction->getParameters() as $refParam) {
-			/** @var ReflectionNamedType|null $refType */
-			$refType = $refParam->getType();
-			/** @var class-string $refParamTypeName */
-			$refParamTypeName = $refType->getName();
-
-			try {
-				array_push(
-					$arguments,
-					$extraArgs[$refParamTypeName] ?? $this->container->get($refParamTypeName)
-				);
-			}
-			catch(ServiceNotFoundException $exception) {
-				if($refType->allowsNull()) {
-					array_push(
-						$arguments,
-						null,
-					);
-				}
-				else {
-					throw $exception;
-				}
-			}
+			array_push($arguments, $this->resolveParameter($refParam, $extraArgs));
 		}
 
 		if($instance) {
@@ -65,5 +45,75 @@ class Injector {
 		}
 
 		return $refFunction->invoke(...$arguments);
+	}
+
+	/** @param array<string, mixed> $extraArgs */
+	private function resolveParameter(
+		ReflectionParameter $refParam,
+		array $extraArgs,
+	):mixed {
+		$refType = $refParam->getType();
+		if(!$refType instanceof ReflectionNamedType) {
+			return $this->resolveUntypedParameter($refParam, $extraArgs);
+		}
+
+		/** @var class-string $refParamTypeName */
+		$refParamTypeName = $refType->getName();
+
+		if(array_key_exists($refParam->getName(), $extraArgs)) {
+			return $extraArgs[$refParam->getName()];
+		}
+		if(array_key_exists($refParamTypeName, $extraArgs)) {
+			return $extraArgs[$refParamTypeName];
+		}
+		if($refParam->isDefaultValueAvailable()) {
+			return $refParam->getDefaultValue();
+		}
+		if($refType->isBuiltin()) {
+			return $this->resolveBuiltinParameter($refType, $refParamTypeName);
+		}
+
+		return $this->resolveServiceParameter($refType, $refParamTypeName);
+	}
+
+	/** @param array<string, mixed> $extraArgs */
+	private function resolveUntypedParameter(
+		ReflectionParameter $refParam,
+		array $extraArgs,
+	):mixed {
+		if($refParam->isDefaultValueAvailable()) {
+			return $refParam->getDefaultValue();
+		}
+
+		return $extraArgs[$refParam->getName()] ?? null;
+	}
+
+	/** @param class-string $refParamTypeName */
+	private function resolveBuiltinParameter(
+		ReflectionNamedType $refType,
+		string $refParamTypeName,
+	):mixed {
+		if($refType->allowsNull()) {
+			return null;
+		}
+
+		throw new ServiceNotFoundException($refParamTypeName);
+	}
+
+	/** @param class-string $refParamTypeName */
+	private function resolveServiceParameter(
+		ReflectionNamedType $refType,
+		string $refParamTypeName,
+	):mixed {
+		try {
+			return $this->container->get($refParamTypeName);
+		}
+		catch(ServiceNotFoundException $exception) {
+			if($refType->allowsNull()) {
+				return null;
+			}
+
+			throw $exception;
+		}
 	}
 }

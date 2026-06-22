@@ -56,4 +56,25 @@ class InjectorTest extends TestCase {
 		self::assertCount(1, $invocationList);
 		self::assertSame($greeter, $invocationList[0]);
 	}
+
+	public function testInvoke_usesDefaultScalarParameter():void {
+		$function = function(string $name = "World"):string {
+			return "Hello, $name!";
+		};
+
+		$sut = new Injector(new Container());
+		self::assertSame("Hello, World!", $sut->invoke(null, $function));
+	}
+
+	public function testInvoke_usesExtraArgByParameterName():void {
+		$function = function(string $name = "World"):string {
+			return "Hello, $name!";
+		};
+
+		$sut = new Injector(new Container());
+		self::assertSame(
+			"Hello, Cron!",
+			$sut->invoke(null, $function, ["name" => "Cron"])
+		);
+	}
 }
