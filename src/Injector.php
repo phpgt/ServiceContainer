@@ -81,11 +81,14 @@ class Injector {
 		ReflectionParameter $refParam,
 		array $extraArgs,
 	):mixed {
+		if(array_key_exists($refParam->getName(), $extraArgs)) {
+			return $extraArgs[$refParam->getName()];
+		}
 		if($refParam->isDefaultValueAvailable()) {
 			return $refParam->getDefaultValue();
 		}
 
-		return $extraArgs[$refParam->getName()] ?? null;
+		return null;
 	}
 
 	/** @param class-string $refParamTypeName */
