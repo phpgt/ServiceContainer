@@ -1,5 +1,5 @@
 <?php
-namespace Gt\ServiceContainer;
+namespace GT\ServiceContainer;
 
 use Psr\Container\NotFoundExceptionInterface;
 use Throwable;
