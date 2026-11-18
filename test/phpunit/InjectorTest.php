@@ -8,9 +8,76 @@ use GT\ServiceContainer\ServiceNotFoundException;
 use GT\ServiceContainer\Test\Example\Greeter;
 use GT\ServiceContainer\Test\Example\PageWithMissingService;
 use PHPUnit\Framework\TestCase;
+use ReflectionFunction;
 use ReflectionMethod;
+use RuntimeException;
 
 class InjectorTest extends TestCase {
+	public function testInvoke_missingServicePreservesExceptionAndAddsFunctionContext():void {
+		$function = function(Greeter $greeter):void {
+			self::fail("The callback must not run without its dependency.");
+		};
+		$declaration = new ReflectionFunction($function);
+		$previous = new RuntimeException("Original cause");
+		$original = new ServiceNotFoundException(Greeter::class, 123, $previous);
+		$trace = $original->getTrace();
+		$container = self::createMock(Container::class);
+		$container->expects(self::once())->method("get")
+			->with(Greeter::class)->willThrowException($original);
+		$sut = new Injector($container);
+
+		try {
+			$sut->invoke(null, $function);
+		}
+		catch(ServiceNotFoundException $exception) {
+			self::assertSame($original, $exception);
+			self::assertSame($trace, $exception->getTrace());
+			self::assertSame(123, $exception->getCode());
+			self::assertSame($previous, $exception->getPrevious());
+			self::assertStringContainsString('$greeter', $exception->getMessage());
+			self::assertStringContainsString($declaration->getName() . "()", $exception->getMessage());
+			self::assertStringContainsString(
+				$declaration->getFileName() . ":" . $declaration->getStartLine(),
+				$exception->getMessage(),
+			);
+			return;
+		}
+
+		self::fail("Expected the missing service exception.");
+	}
+
+	public function testInvoke_missingLoaderDependencyIncludesBothDeclarations():void {
+		$loader = function(DateTime $clock):Greeter {
+			self::fail("The loader must not run without its dependency.");
+		};
+		$container = new Container();
+		$container->setLoader(Greeter::class, $loader);
+		$sut = new Injector($container);
+		$page = new PageWithMissingService();
+		$loaderDeclaration = new ReflectionFunction($loader);
+		$pageDeclaration = new ReflectionMethod($page, "go");
+
+		try {
+			$sut->invoke($page, "go");
+		}
+		catch(ServiceNotFoundException $exception) {
+			$message = $exception->getMessage();
+			self::assertStringContainsString('"' . DateTime::class . '"', $message);
+			self::assertStringContainsString('$clock', $message);
+			self::assertStringContainsString('$greeter', $message);
+			self::assertStringContainsString(PageWithMissingService::class . "::go", $message);
+			foreach([$loaderDeclaration, $pageDeclaration] as $declaration) {
+				self::assertStringContainsString(
+					$declaration->getFileName() . ":" . $declaration->getStartLine(),
+					$message,
+				);
+			}
+			return;
+		}
+
+		self::fail("Expected the missing loader dependency exception.");
+	}
+
 	public function testInvoke_missingServiceIdentifiesApplicationDeclaration():void {
 		$page = new PageWithMissingService();
 		$declaration = new ReflectionMethod($page, "go");
