@@ -6,9 +6,34 @@ use GT\ServiceContainer\Container;
 use GT\ServiceContainer\Injector;
 use GT\ServiceContainer\ServiceNotFoundException;
 use GT\ServiceContainer\Test\Example\Greeter;
+use GT\ServiceContainer\Test\Example\PageWithMissingService;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 class InjectorTest extends TestCase {
+	public function testInvoke_missingServiceIdentifiesApplicationDeclaration():void {
+		$page = new PageWithMissingService();
+		$declaration = new ReflectionMethod($page, "go");
+		$sut = new Injector(new Container());
+
+		try {
+			$sut->invoke($page, "go");
+		}
+		catch(ServiceNotFoundException $exception) {
+			$message = $exception->getMessage();
+			self::assertStringContainsString(Greeter::class, $message);
+			self::assertStringContainsString(PageWithMissingService::class . "::go", $message);
+			self::assertStringContainsString('$greeter', $message);
+			self::assertStringContainsString(
+				$declaration->getFileName() . ":" . $declaration->getStartLine(),
+				$message,
+			);
+			return;
+		}
+
+		self::fail("Expected the missing service to prevent callback invocation.");
+	}
+
 	public function testInvoke():void {
 		$greeter = self::createStub(Greeter::class);
 		$greeter->method("greet")
