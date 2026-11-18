@@ -37,7 +37,13 @@ class Injector {
 		}
 
 		foreach($refFunction->getParameters() as $refParam) {
-			array_push($arguments, $this->resolveParameter($refParam, $extraArgs));
+			try {
+				array_push($arguments, $this->resolveParameter($refParam, $extraArgs));
+			}
+			catch(ServiceNotFoundException $exception) {
+				$exception->addParameterContext($refParam);
+				throw $exception;
+			}
 		}
 
 		if($instance) {
